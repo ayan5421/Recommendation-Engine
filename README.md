@@ -39,6 +39,8 @@ We merged the two datasets in order to get all the informations about the actors
 - ast module
 - nltk (Natural Language Toolkit)
 - pickle
+- streamlit
+- requests
 
 ## Process:
 We are using the 2 files of the dataset in pre-processing (using Movie Recommender.ipynb) and then generating 2 new files 'movies_dictionary.pkl' and 'sim.pkl'. These 2 files are then used by Remsik.py to predict the recommendations for a given movie by the user. Content based Filtering is used here, so the steps in pre-processing involve creating tags for each and every movie and after that vectorizing each movie and then creating a matrix containig the cosine distances (similarity score) between each and every movie. That similarity score is used to recommend movies by Remsik.py (more the score similar are the movies).
