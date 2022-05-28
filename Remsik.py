@@ -1,12 +1,13 @@
+from pathlib import Path
 import streamlit as st
 import pickle as pk
 import pandas as pd
 import requests as req
 
 #opening files
-movies_dictionary = pk.load(open('movies_dictionary.pkl','rb'))
+movies_dictionary = pk.load(open(Path(__file__).parent/'movies_dictionary.pkl','rb'))
 movies = pd.DataFrame(movies_dictionary)
-sim = pk.load(open('sim.pkl','rb'))
+sim = pk.load(open(Path(__file__).parent/'sim.pkl','rb'))
 
 #function to fetch poster from tmdb database using movie id
 def poster(id):
