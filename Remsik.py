@@ -100,7 +100,7 @@ elif authentication_status == True:
     if menu=='Recommendations':
         col1, col2, = st.columns([3,1])
         with col1:
-            st.header('Your Suggesions:')
+            st.header('Your Suggestions:')
         with col2:
             count = st.number_input('Page number', min_value=1, step=1) - 1
 
