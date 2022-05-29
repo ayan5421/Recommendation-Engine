@@ -86,7 +86,7 @@ elif authentication_status == True:
             st.header(option)
             poster(movies.iloc[movies[movies['original_title'] == option].index[0]].id)
         if option !=  'Select Movie':
-            user_movie = pd.DataFrame([{'id':movies.iloc[movies[movies['original_title'] == option].index[0]].id}])
+            user_movie = pd.DataFrame([{'id':str(movies.iloc[movies[movies['original_title'] == option].index[0]].id)}])
             user_movie.to_sql('user_movies_'+username,engine,if_exists='append',index=False)
 
     menu = option_menu(menu_title=None,options=['Recommendations','Profile'],icons=['book-half','person-bounding-box'],orientation='horizontal')
