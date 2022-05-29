@@ -51,11 +51,17 @@ if status == 'SignUp':
         submit = st.form_submit_button("SignUp")
         if submit == True and password == confirm_password:
             hashed_password = sa.Hasher([password]).generate()
-            data = pd.DataFrame([{'name':name,'username':username,'hashed_password':hashed_password[0]}])
-            try:
+            user_details = pd.read_sql('user_details',engine)
+            duplicate =0
+            for i in range(0,len(user_details)):
+                if user_details['username'][i]==username:
+                    duplicate =1
+                    break
+            if duplicate==0:
+                data = pd.DataFrame([{'name':name,'username':username,'hashed_password':hashed_password[0]}])
                 data.to_sql('user_details',engine,if_exists='append',index=False)
                 st.info('Go to Login menu to login')
-            except:
+            else:
                 st.warning('The username is already taken... Create another username')
         elif submit == True and password != confirm_password:
             st.warning("Password and Confirm Password doesn't match")
