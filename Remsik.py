@@ -135,20 +135,19 @@ elif authentication_status == True:
             try:
                 movie_record = pd.read_sql('user_movies_' + username,engine)
                 length = len(movie_record)
+                new = pd.DataFrame([{'id':movie_record['id'][0]}])
+                for i in range(0,len(movie_record)-1):
+                    if movie_record['id'][i] != movie_record['id'][i+1]:
+                        new = new.append({'id':movie_record['id'][i+1]},ignore_index=True)
+                new.to_sql('user_movies_' + username,engine,if_exists='replace',index=False)
+                if len(new)<=5:
+                    effective = len(new)
+                else:
+                    effective = 5
+                col = st.columns(effective)
+                for i in range(0,effective):
+                    with col[i]:
+                        st.text(movies.iloc[movies[movies['id'] == int(new['id'][len(new) -1 -i])].index[0]].original_title)
+                        poster(int(new['id'][len(new) -1 -i]))
             except:
                 st.caption('Everything seems so quiet here... Search for movies first')
-                length = 0
-            new = pd.DataFrame([{'id':movie_record['id'][0]}])
-            for i in range(0,len(movie_record)-1):
-                if movie_record['id'][i] != movie_record['id'][i+1]:
-                    new = new.append({'id':movie_record['id'][i+1]},ignore_index=True)
-            new.to_sql('user_movies_' + username,engine,if_exists='replace',index=False)
-            if len(new)<=5 and length !=0:
-                effective = len(new)
-            else:
-                effective = 5
-            col = st.columns(effective)
-            for i in range(0,effective):
-                with col[i]:
-                    poster(int(new['id'][len(new) -1 -i]))
-                    st.text(movies.iloc[movies[movies['id'] == int(new['id'][len(new) -1 -i])].index[0]].original_title)
