@@ -1,5 +1,5 @@
 # Recommendation-Engine
-Recommendation Engine for Microsoft Engage Project, using [TMDB 5000 movies datasets](https://www.kaggle.com/tmdb/tmdb-movie-metadata),using Content based Filtering
+Recommendation Engine using [TMDB 5000 movies datasets](https://www.kaggle.com/tmdb/tmdb-movie-metadata),using Content based Filtering
 ## Link to the web application
 [Remsik Movie Recommender](https://remsik-movie-recommender.herokuapp.com/)
 ## Data
