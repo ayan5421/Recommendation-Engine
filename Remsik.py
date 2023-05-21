@@ -6,7 +6,6 @@ import streamlit_authenticator as sa
 import pickle as pk
 import pandas as pd
 import requests as req
-import sqlite3
 import sqlalchemy
 
 engine = sqlalchemy.create_engine('sqlite:///user_data.db')
@@ -46,10 +45,12 @@ if status == 'SignUp':
         st.subheader('REMSIK MOVIE RECOMMENDER SIGNUP')
         name = st.text_input('Enter your Name')
         username = st.text_input('Enter a Username (This will be used during Login)')
-        password = st.text_input('Password',type='password')
+        password = st.text_input('Password (Minimum 8 characters)',type='password')
         confirm_password = st.text_input('Confirm Password',type='password')
         submit = st.form_submit_button("SignUp")
-        if submit == True and password == confirm_password:
+        if submit == True and len(password)<8:
+            st.warning('The password should be minumum 8 characters long')
+        elif submit == True and password == confirm_password:
             hashed_password = sa.Hasher([password]).generate()
             user_details = pd.read_sql('user_details',engine)
             duplicate =0
@@ -93,7 +94,15 @@ elif authentication_status == True:
             poster(movies.iloc[movies[movies['original_title'] == option].index[0]].id)
         if option !=  'Select Movie':
             user_movie = pd.DataFrame([{'id':str(movies.iloc[movies[movies['original_title'] == option].index[0]].id)}])
-            user_movie.to_sql('user_movies_'+username,engine,if_exists='append',index=False)
+            insp = sqlalchemy.inspect(engine)
+            check = insp.has_table('user_movies_' + username)
+            if check:
+                movie_record = pd.read_sql('user_movies_' + username,engine)
+                if movie_record['id'][len(movie_record)-1] != user_movie['id'][0]:
+                    user_movie.to_sql('user_movies_'+username,engine,if_exists='append',index=False)
+            else:
+                user_movie.to_sql('user_movies_'+username,engine,if_exists='append',index=False)
+            
 
     menu = option_menu(menu_title=None,options=['Recommendations','Profile'],icons=['book-half','person-bounding-box'],orientation='horizontal')
 
@@ -138,22 +147,18 @@ elif authentication_status == True:
                 st.success('Password Changed Successfully')
         with st.container():
             st.subheader('You searched for these movies back :')
-            try:
+            insp = sqlalchemy.inspect(engine)
+            check = insp.has_table('user_movies_' + username)
+            if check:
                 movie_record = pd.read_sql('user_movies_' + username,engine)
-                length = len(movie_record)
-                new = pd.DataFrame([{'id':movie_record['id'][0]}])
-                for i in range(0,len(movie_record)-1):
-                    if movie_record['id'][i] != movie_record['id'][i+1]:
-                        new = new.append({'id':movie_record['id'][i+1]},ignore_index=True)
-                new.to_sql('user_movies_' + username,engine,if_exists='replace',index=False)
-                if len(new)<=5:
-                    effective = len(new)
+                if len(movie_record)<5:
+                    effective = len(movie_record)
                 else:
                     effective = 5
-                col = st.columns(effective)
+                col = st.columns(5)
                 for i in range(0,effective):
                     with col[i]:
-                        st.text(movies.iloc[movies[movies['id'] == int(new['id'][len(new) -1 -i])].index[0]].original_title)
-                        poster(int(new['id'][len(new) -1 -i]))
-            except:
+                        st.text(movies.iloc[movies[movies['id'] == int(movie_record['id'][len(movie_record) -1 -i])].index[0]].original_title)
+                        poster(int(movie_record['id'][len(movie_record) -1 -i]))
+            else:
                 st.caption('Everything seems so quiet here... Search for movies first')
